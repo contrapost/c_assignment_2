@@ -1,0 +1,10 @@
+main
+1. get list of files and size of part (30x30) as argument from command line
+2. check file names and make 2D array (number of columns x number of rows). 
+3. call read for each file from list and put them into the array
+4. call merge with the array
+
+read
+1. make part form characters in file and add coordinates from file name
+
+merge
