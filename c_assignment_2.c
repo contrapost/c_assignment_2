@@ -8,6 +8,8 @@
 #define LENGTH_OF_FILENAME 256
 #define DEFAUL_SIZE_OF_PART 30
 
+char** getPart(char* fileName, char** part);
+
 int main(int argc, char* argv[]) {
     
     // Checks if there is no arguments (dirname isn't mentioned)
@@ -134,13 +136,19 @@ int main(int argc, char* argv[]) {
     
     printf("Number of col: %d, number of rows: %d\n", numberOfColumns, numberOfRows);
     
-    //char** part;
-    //part = malloc(sizeof(char*) * DEFAUL_SIZE_OF_PART);
+    char*** parts;
+    parts = malloc(numberOfFileNames * sizeof(char**));
+    for(int i = 0; i < numberOfFileNames; i++) {
+        parts[i] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char*));
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
+            parts[i][j] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char));
+        }
+    }
     
-    //for(int i = 0; i < DEFAUL_SIZE_OF_PART; i++)
-    //{
-    //    part[i] = malloc(sizeof(char) * DEFAUL_SIZE_OF_PART);
-    //}
+    for(int i = 0; i < numberOfFileNames; i++)
+    {
+        parts[i] = getPart(fileNames[i], parts[i]);
+    }
     
     // =============== reading files from the array =======================
     
@@ -156,4 +164,8 @@ int main(int argc, char* argv[]) {
     free(fileNames);
     
     return 0;
+}
+
+char** getPart(char* fileName, char** part) {
+    return part;
 }
