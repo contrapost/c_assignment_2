@@ -10,17 +10,20 @@
 
 char** getPart(char* fileName, char** part);
 
+char** sort(char **array, int counter);
+
 int main(int argc, char* argv[]) {
     
     // Checks if there is no arguments (dirname isn't mentioned)
     if(argc < 2)
     {
-        printf("%s\n%s\n", "You forgot to write a name of directory as argument.",
-               "NB! Please enter the hole path to the directory.");
+        printf("%s\n%s\n", 
+        		"You forgot to write a name of directory as argument.",
+           	    "NB! Please enter the hole path to the directory.");
         return -1;
     }
     
-    // ================= Store file names from directory in the array ======================
+    // ========== Store file names from directory in the array ================
     
     DIR *dir;
     struct dirent *ent;
@@ -47,18 +50,20 @@ int main(int argc, char* argv[]) {
             {
                 if (sizeOfListWithFileNames > numberOfFileNames)
                 {
-                    strcpy(fileNames[numberOfFileNames++], ent->d_name);
+                	strcpy(fileNames[numberOfFileNames], argv[1]);
+                    strcat(fileNames[numberOfFileNames++], ent->d_name);
                 }
                 else
                 {
                     int sizeOfPrevious = sizeOfListWithFileNames;
                     
-                    // If the number of strings is equal to the length of the array,
-                    // the program doubles the size of the array.
+                    // If the number of strings is equal to the length of 
+                    // the array, the program doubles the size of the array.
                     sizeOfListWithFileNames *= 2;
                     
                     // Reallocates memory for the enlarged array.
-                    fileNames = realloc(fileNames, sizeof(char*)*(sizeOfListWithFileNames));
+                    fileNames = realloc(fileNames, 
+                    			sizeof(char*)*(sizeOfListWithFileNames));
                     if (fileNames == NULL) {
                         printf("Can't allocate memory\n");
                         return -1;
@@ -70,7 +75,8 @@ int main(int argc, char* argv[]) {
                         // Reallocates memory for the existing strings.
                         if(i < sizeOfPrevious)
                         {
-                            fileNames[i]=realloc(fileNames[i], LENGTH_OF_FILENAME * sizeof(char));
+                            fileNames[i]=realloc(fileNames[i], 
+                            			LENGTH_OF_FILENAME * sizeof(char));
                             if (fileNames[i] == NULL)
                             {
                                 printf("Can't allocate memory\n");
@@ -80,12 +86,14 @@ int main(int argc, char* argv[]) {
                         //Allocates memory for new strings.
                         else
                         {
-                            fileNames[i]=malloc(LENGTH_OF_FILENAME * sizeof(char));
+                            fileNames[i] = 
+                            	malloc(LENGTH_OF_FILENAME * sizeof(char));
                         }
                     }
-                    // Copies the last line that was read from file to the first empty
-                    // index in the array.
-                    strcpy(fileNames[numberOfFileNames++], ent->d_name);
+                    // Copies the last line that was read from file to the 
+                    // first empty index in the array.
+                    strcpy(fileNames[numberOfFileNames], argv[1]);
+                    strcat(fileNames[numberOfFileNames++], ent->d_name);
                 }
             }
         }
@@ -93,11 +101,13 @@ int main(int argc, char* argv[]) {
     }
     else
     {
-        perror ("Couldn't open the directory. Please enter the hole path to the directory.");
+        perror ("Couldn't open the directory. Please enter the hole path. ");
         return EXIT_FAILURE;
     }
     
     // ============ Get number of columns and rows =====================
+    
+    fileNames = sort(fileNames, numberOfFileNames);
     
     int numberOfRows, numberOfColumns;
     char* p = fileNames[numberOfFileNames - 1];
@@ -130,11 +140,13 @@ int main(int argc, char* argv[]) {
     // Check if the file name contains numbers of both columns and rows.
     if (first <= 1)
     {
-        printf("Wrong format of file name. Cannot detect the position of the fragment\n");
+        printf("%s %s\n", "Wrong format of file name.", 
+        					"Cannot detect the position of the fragment");
         return -1;
     }
     
-    printf("Number of col: %d, number of rows: %d\n", numberOfColumns, numberOfRows);
+    printf("Number of col: %d, number of rows: %d\n", 
+    					numberOfColumns, numberOfRows);
     
     char*** parts;
     parts = malloc(numberOfFileNames * sizeof(char**));
@@ -148,6 +160,16 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < numberOfFileNames; i++)
     {
         parts[i] = getPart(fileNames[i], parts[i]);
+        if (parts[i] == NULL)
+        {
+        	for(int i = 0; i < numberOfFileNames; i++) 
+        	{
+        		free(fileNames[i]);
+    		}
+    
+   			free(fileNames);
+        	return -1;
+        }
     }
     
     // =============== reading files from the array =======================
@@ -155,9 +177,29 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < numberOfFileNames; i++) {
         printf("%d. %s\n", i + 1, fileNames[i]);
     }
+    
+    /*for(int i = 0; i < numberOfFileNames; i++) {
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
+        {
+        	printf("%s\n", parts[i][j]);
+        }
+    }*/
 
     // =================== freeing the memory ============================
+    
     for(int i = 0; i < numberOfFileNames; i++) {
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
+            free(parts[i][j]);
+        }
+    }
+    
+    for(int i = 0; i < numberOfFileNames; i++) {
+    	free(parts[i]);
+    }
+    
+    free(parts);
+    
+    for(int i = 0; i < sizeOfListWithFileNames; i++) {
         free(fileNames[i]);
     }
     
@@ -167,5 +209,75 @@ int main(int argc, char* argv[]) {
 }
 
 char** getPart(char* fileName, char** part) {
+
+	FILE *file = fopen(fileName, "r");
+	
+	if (file == NULL)
+	{
+		return NULL;
+	}
+    
+    for(int i = 0; i < DEFAUL_SIZE_OF_PART; i++)
+    {
+    	for(int j  = 0; j < DEFAUL_SIZE_OF_PART; j++)
+    	{
+    		int c;
+    		if ((c = fgetc(file)) != EOF)
+    		{
+    			part[i] [j] = (char) c;
+    		} 
+    		else 
+    		{
+    			printf("The fragment doesn't contain enough characters");
+    			return NULL;
+    		}
+    		
+    	}
+    }
+    
+    // Closes the file.
+	fclose(file);
+	
     return part;
 }
+
+char** sort(char **array, int length){
+	int comparisionResult;
+    char tmpLine[LENGTH_OF_FILENAME];
+
+	// Checks if there is only one element in the array so it's unnecessary
+	// to sort it.
+    if (length <= 1)
+    {
+        return array;
+	}
+	
+	// Iterates through the array until it's sorted.
+    for (int i = 0; i < length - 1; i++)
+    {
+    	int swapped = 0;
+    	// Compares each neighboring pair of elements.
+        for (int j = 0; j < length - i - 1; j++)
+        {
+            comparisionResult = strcmp(array[j], array[j+1]);
+			
+			// Swaps the elements if they are in wrong order.
+            if (comparisionResult > 0)
+            {
+                strcpy(tmpLine, array[j+1]);
+                strcpy(array[j+1], array[j]);
+                strcpy(array[j], tmpLine);
+                swapped = 1;
+            }
+        }
+        
+        // If swapped hasn't been change, it means that array is already sorted.
+        if(swapped == 0)
+        {
+        	break;
+        }
+    }
+
+	return array;
+}
+
