@@ -12,6 +12,8 @@ char** getPart(char* fileName, char** part);
 
 char** sort(char **array, int counter);
 
+char** mergeParts(char** mergedPicture, char*** parts, int numberOfRows, int numberOfColumns);
+
 int main(int argc, char* argv[]) {
     
     // Checks if there is no arguments (dirname isn't mentioned)
@@ -122,12 +124,12 @@ int main(int argc, char* argv[]) {
             long val = strtol(p, &p, 10); // Read a number, ...
             if(first == 0)
             {
-                numberOfColumns = val;
+                numberOfColumns = val + 1;
                 first++;
             }
             else if (first == 1)
             {
-                numberOfRows = val;
+                numberOfRows = val + 1;
                 first++;
             }
         }
@@ -142,6 +144,13 @@ int main(int argc, char* argv[]) {
     {
         printf("%s %s\n", "Wrong format of file name.", 
         					"Cannot detect the position of the fragment");
+        
+        for(int i = 0; i < sizeOfListWithFileNames; i++) {
+            free(fileNames[i]);
+        }
+        
+        free(fileNames);
+        
         return -1;
     }
     
@@ -153,15 +162,29 @@ int main(int argc, char* argv[]) {
     for(int i = 0; i < numberOfFileNames; i++) {
         parts[i] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char*));
         for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
-            parts[i][j] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char));
+            parts[i][j] = malloc((DEFAUL_SIZE_OF_PART + 1) * sizeof(char));
         }
     }
+    
+    // =============== reading files from the array =======================
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
         parts[i] = getPart(fileNames[i], parts[i]);
         if (parts[i] == NULL)
         {
+            for(int i = 0; i < numberOfFileNames; i++) {
+                for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
+                    free(parts[i][j]);
+                }
+            }
+            
+            for(int i = 0; i < numberOfFileNames; i++) {
+                free(parts[i]);
+            }
+            
+            free(parts);
+            
         	for(int i = 0; i < numberOfFileNames; i++) 
         	{
         		free(fileNames[i]);
@@ -172,20 +195,48 @@ int main(int argc, char* argv[]) {
         }
     }
     
-    // =============== reading files from the array =======================
+   
+    
+    char** mergedPicture;
+    mergedPicture = malloc(numberOfRows * DEFAUL_SIZE_OF_PART * sizeof(char*));
+    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    {
+        mergedPicture[i] = malloc(DEFAUL_SIZE_OF_PART * numberOfColumns * sizeof(char));
+    }
+    
+    mergedPicture = mergeParts(mergedPicture, parts, numberOfRows, numberOfColumns);
+    
+    // =============== DEBUGGING =======================
     
     for(int i = 0; i < numberOfFileNames; i++) {
         printf("%d. %s\n", i + 1, fileNames[i]);
     }
     
-    /*for(int i = 0; i < numberOfFileNames; i++) {
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
-        {
-        	printf("%s\n", parts[i][j]);
+   /* int counter = 0;
+    for(int i = 0; i < numberOfFileNames; i++){
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++){
+            for(int k = 0; k < DEFAUL_SIZE_OF_PART; k++) {
+                printf("%c", parts[i][j][k]);
+                counter++;
+                if(counter % 31 == 0) printf("\n");
+            }
         }
-    }*/
-
+    } */
+    
+    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    {
+        printf("%s\n", mergedPicture[i]);
+    }
+    
     // =================== freeing the memory ============================
+    
+    
+    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    {
+        free(mergedPicture[i]);
+    }
+    
+    free(mergedPicture);
     
     for(int i = 0; i < numberOfFileNames; i++) {
         for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
@@ -224,14 +275,14 @@ char** getPart(char* fileName, char** part) {
     		int c;
     		if ((c = fgetc(file)) != EOF)
     		{
-    			part[i] [j] = (char) c;
+    			part[i][j] = (char) c;
     		} 
     		else 
     		{
     			printf("The fragment doesn't contain enough characters");
     			return NULL;
     		}
-    		
+            part[i][DEFAUL_SIZE_OF_PART] = '\0';
     	}
     }
     
@@ -281,3 +332,18 @@ char** sort(char **array, int length){
 	return array;
 }
 
+char** mergeParts(char** mergedPicture, char*** parts, int numberOfRows, int numberOfColumns) {
+    
+    for(int i = 0; i < numberOfRows; i++)
+    {
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
+        {
+            strcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], parts[i][j]);
+            for(int k = 1; k < numberOfColumns; k++)
+            {
+                strcat(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], parts[i + k * numberOfRows][j]);
+            }
+        }
+    }
+    return mergedPicture;
+}
