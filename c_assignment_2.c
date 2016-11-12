@@ -201,7 +201,7 @@ int main(int argc, char* argv[]) {
     mergedPicture = malloc(numberOfRows * DEFAUL_SIZE_OF_PART * sizeof(char*));
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
-        mergedPicture[i] = malloc(DEFAUL_SIZE_OF_PART * numberOfColumns * sizeof(char));
+        mergedPicture[i] = malloc((DEFAUL_SIZE_OF_PART * numberOfColumns + 1) * sizeof(char));
     }
     
     mergedPicture = mergeParts(mergedPicture, parts, numberOfRows, numberOfColumns);
