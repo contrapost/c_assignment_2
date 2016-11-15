@@ -8,7 +8,7 @@
 #define LENGTH_OF_FILENAME 256
 #define DEFAUL_SIZE_OF_PART 30
 
-char** getPart(char* fileName, char** part);
+char** readPartFromFile(char* fileName, char** part);
 
 char** sort(char **array, int counter);
 
@@ -201,11 +201,13 @@ int main(int argc, char* argv[])
         }
     }
     
+    // char parts[numberOfFileNames][DEFAUL_SIZE_OF_PART][DEFAUL_SIZE_OF_PART];
+    
     // =============== reading files from the array =======================
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
-        parts[i] = getPart(fileNames[i], parts[i]);
+        parts[i] = readPartFromFile(fileNames[i], parts[i]);
         if (parts[i] == NULL)
         {
             for(int i = 0; i < numberOfFileNames; i++) 
@@ -255,13 +257,17 @@ int main(int argc, char* argv[])
         printf("%d. %s\n", i + 1, fileNames[i]);
     }
     
-   /* int counter = 0;
-    for(int i = 0; i < numberOfFileNames; i++){
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++){
-            for(int k = 0; k < DEFAUL_SIZE_OF_PART; k++) {
+    /*
+    int counter = 0;
+    for(int i = 0; i < numberOfFileNames; i++)
+    {
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
+        {
+            for(int k = 0; k < DEFAUL_SIZE_OF_PART; k++) 
+            {
                 printf("%c", parts[i][j][k]);
                 counter++;
-                if(counter % 31 == 0) printf("\n");
+               	if(counter % 31 == 0) printf("\n");
             }
         }
     } 
@@ -302,7 +308,7 @@ int main(int argc, char* argv[])
     return 0;
 }
 
-char** getPart(char* fileName, char** part) 
+char** readPartFromFile(char* fileName, char** part) 
 {
 	FILE *file = fopen(fileName, "r");
 	
@@ -328,6 +334,19 @@ char** getPart(char* fileName, char** part)
     	}
     }
     
+    //DEBUGGING
+    
+    int counter = 0;
+    for(int j = 0; j < 30; j++)
+    {
+        for(int k = 0; k < 30; k++) 
+        {
+            printf("%c", part[j][k]);
+            counter++;
+           if(counter % 31 == 0) printf("\n");
+        }
+    }
+    
     // Closes the file.
 	fclose(file);
 	
@@ -345,7 +364,8 @@ char** mergeParts(char** mergedPicture, char*** parts,
             strcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], parts[i][j]);
             for(int k = 1; k < numberOfColumns; k++)
             {
-                strcat(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], parts[i + k * numberOfRows][j]);
+                strcat(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], 
+                							parts[i + k * numberOfRows][j]);
             }
         }
     }
