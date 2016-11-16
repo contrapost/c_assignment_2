@@ -30,7 +30,7 @@ int main(int argc, char* argv[]) {
             {
                 printf("%c", picture[j][k]);
                 counter++;
-               // if(counter % 31 == 0) printf("\n");
+                if(counter % 31 == 0) printf("\n");
             }
         }
     

@@ -181,7 +181,7 @@ int main(int argc, char* argv[])
     if (first <= 1)
     {
         printf("%s %s\n", "Wrong format of file name.", 
-        					"Cannot detect the position of the fragment");
+        					"Cannot detect the positions of the fragments");
         
         for(int i = 0; i < sizeOfListWithFileNames; i++) {
             free(fileNames[i]);
@@ -200,8 +200,6 @@ int main(int argc, char* argv[])
             parts[i][j] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char));
         }
     }
-    
-    // char parts[numberOfFileNames][DEFAUL_SIZE_OF_PART][DEFAUL_SIZE_OF_PART];
     
     // =============== reading files from the array =======================
     
@@ -257,7 +255,7 @@ int main(int argc, char* argv[])
         printf("%d. %s\n", i + 1, fileNames[i]);
     }
     
-    /*
+    
     int counter = 0;
     for(int i = 0; i < numberOfFileNames; i++)
     {
@@ -272,7 +270,7 @@ int main(int argc, char* argv[])
         }
     } 
     
-    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+   /* for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
         printf("%s\n", mergedPicture[i]);
     } */
