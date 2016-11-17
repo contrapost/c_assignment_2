@@ -40,8 +40,6 @@ int main(int argc, char* argv[])
     
     // Allocate memory for array of file names
     fileNames = malloc(sizeOfListWithFileNames * sizeof(char*));
-    
-    // Allocate memory for file names
     for(int i = 0; i < sizeOfListWithFileNames; i++)
     {
         fileNames[i]=malloc(LENGTH_OF_FILENAME * sizeof(char));
@@ -71,7 +69,8 @@ int main(int argc, char* argv[])
     	strcat(dirname, "/");
     }
    
-    // get all the files and directories within directory
+    // Get all the files and directories within directory (using code from
+    // assignment 1)
     while ((ent = readdir (dir)) != NULL)
     {
         // get only .txt files
@@ -86,11 +85,8 @@ int main(int argc, char* argv[])
             {
                 int sizeOfPrevious = sizeOfListWithFileNames;
                 
-                // If the number of strings is equal to the length of 
-                // the array, the program doubles the size of the array.
                 sizeOfListWithFileNames *= 2;
                 
-                // Reallocates memory for the enlarged array.
                 fileNames = realloc(fileNames, 
                 			sizeof(char*)*(sizeOfListWithFileNames));
                 if (fileNames == NULL) {
@@ -106,10 +102,8 @@ int main(int argc, char* argv[])
                     return EXIT_FAILURE;
                 }
                 
-                // (Re)allocates memory for strings.
                 for(int i = 0; i < sizeOfListWithFileNames; i++)
                 {
-                    // Reallocates memory for the existing strings.
                     if(i < sizeOfPrevious)
                     {
                         fileNames[i]=realloc(fileNames[i], 
@@ -128,15 +122,12 @@ int main(int argc, char* argv[])
                             return EXIT_FAILURE;
                         }
                     }
-                    //Allocates memory for new strings.
                     else
                     {
                         fileNames[i] = 
                         	malloc(LENGTH_OF_FILENAME * sizeof(char));
                     }
                 }
-                // Copies the last filename that was read from directory to the 
-                // first empty index in the array.
                 strcpy(fileNames[numberOfFileNames], dirname);
                 strcat(fileNames[numberOfFileNames++], ent->d_name);
             }
@@ -155,7 +146,7 @@ int main(int argc, char* argv[])
     
     int first = 0;
     
-    while (*p) // While there are more characters to process...
+    while (*p)
     { 
         if (isdigit(*p))
         { 
@@ -192,6 +183,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
+    // Allocate memory for 3D array to store contain of the files.
     char*** parts;
     parts = malloc(numberOfFileNames * sizeof(char**));
     for(int i = 0; i < numberOfFileNames; i++) {
@@ -201,11 +193,12 @@ int main(int argc, char* argv[])
         }
     }
     
-    // =============== reading files from the array =======================
+    // ================= Reading files from the array =======================
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
         parts[i] = readPartFromFile(fileNames[i], parts[i]);
+        
         if (parts[i] == NULL)
         {
             for(int i = 0; i < numberOfFileNames; i++) 
@@ -234,8 +227,9 @@ int main(int argc, char* argv[])
         }
     }
     
-    // ===================== merging fragments ===========================
+    // ======================= Merging fragments =============================
     
+    // Allocating memory for array of strings containing the resault of merging
     char** mergedPicture;
     mergedPicture = malloc(numberOfRows * DEFAUL_SIZE_OF_PART * sizeof(char*));
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
@@ -248,9 +242,9 @@ int main(int argc, char* argv[])
     mergedPicture = mergeParts(mergedPicture, 
     									parts, numberOfRows, numberOfColumns);
     
-    // =============== DEBUGGING =======================
+    // =========================== Debugging =================================
         
-    printf("Number of col: %d, number of rows: %d\n", 
+    /*printf("Number of col: %d, number of rows: %d\n", 
     					numberOfColumns, numberOfRows);
     
     for(int i = 0; i < numberOfFileNames; i++) {
@@ -260,9 +254,60 @@ int main(int argc, char* argv[])
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
         printf("%s", mergedPicture[i]);
-    } 
+    } */
     
-    // =================== freeing the memory ============================
+    // ==================== Write result to the file ==========================
+    
+    FILE *resultFiel = fopen("result.txt", "w");
+    
+	if (resultFiel == NULL)
+	{
+		perror ("Error opening file");
+		
+		for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+		{
+		    free(mergedPicture[i]);
+		}
+		
+		free(mergedPicture);
+		
+		for(int i = 0; i < numberOfFileNames; i++) 
+        {
+            for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) 
+            {
+                free(parts[i][j]);
+            }
+        }
+        
+        for(int i = 0; i < numberOfFileNames; i++) 
+        {
+            free(parts[i]);
+        }
+        
+        free(parts);
+        
+    	for(int i = 0; i < numberOfFileNames; i++) 
+    	{
+    		free(fileNames[i]);
+		}
+
+		free(fileNames);
+		
+		return EXIT_FAILURE;
+	}
+	
+	for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    {
+        fprintf(resultFiel, "%s", mergedPicture[i]);
+    } 
+    fprintf(resultFiel, "%s", "\n");
+    
+    fclose(resultFiel);
+    
+    printf("%s\n%s\n", "Result of merging files is saved in result.txt", 
+    				   "You can ispect it by calling cat result.txt");
+    
+    // ====================== Freeing the memory =============================
     
     
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
@@ -319,7 +364,6 @@ char** readPartFromFile(char* fileName, char** part)
     	}
     }
     
-    // Closes the file.
 	fclose(file);
 	
     return part;
@@ -350,28 +394,25 @@ char** mergeParts(char** mergedPicture, char*** parts,
     return mergedPicture;
 }
 
+// Use sort algorithm from assignment 1
 char** sort(char **array, int length)
 {
 	int comparisionResult;
     char tmpLine[LENGTH_OF_FILENAME];
 
-	// Checks if there is only one element in the array so it's unnecessary
-	// to sort it.
     if (length <= 1)
     {
         return array;
 	}
 	
-	// Iterates through the array until it's sorted.
     for (int i = 0; i < length - 1; i++)
     {
     	int swapped = 0;
-    	// Compares each neighboring pair of elements.
+    	
         for (int j = 0; j < length - i - 1; j++)
         {
             comparisionResult = strcmp(array[j], array[j+1]);
 			
-			// Swaps the elements if they are in wrong order.
             if (comparisionResult > 0)
             {
                 strcpy(tmpLine, array[j+1]);
@@ -381,7 +422,6 @@ char** sort(char **array, int length)
             }
         }
         
-        // If swapped hasn't been change, it means that array is already sorted.
         if(swapped == 0)
         {
         	break;
