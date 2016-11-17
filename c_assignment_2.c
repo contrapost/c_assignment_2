@@ -241,10 +241,12 @@ int main(int argc, char* argv[])
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
         mergedPicture[i] = 
-        		malloc(DEFAUL_SIZE_OF_PART * numberOfColumns * sizeof(char));
+        	malloc((DEFAUL_SIZE_OF_PART * numberOfColumns + 1) * sizeof(char));
+        		
     }
     
-   // mergedPicture = mergeParts(mergedPicture, parts, numberOfRows, numberOfColumns);
+    mergedPicture = mergeParts(mergedPicture, 
+    									parts, numberOfRows, numberOfColumns);
     
     // =============== DEBUGGING =======================
         
@@ -255,25 +257,10 @@ int main(int argc, char* argv[])
         printf("%d. %s\n", i + 1, fileNames[i]);
     }
     
-    
-    int counter = 0;
-    for(int i = 0; i < numberOfFileNames; i++)
+    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
-        {
-            for(int k = 0; k < DEFAUL_SIZE_OF_PART; k++) 
-            {
-                printf("%c", parts[i][j][k]);
-                counter++;
-               	if(counter % 31 == 0) printf("\n");
-            }
-        }
+        printf("%s", mergedPicture[i]);
     } 
-    
-   /* for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
-    {
-        printf("%s\n", mergedPicture[i]);
-    } */
     
     // =================== freeing the memory ============================
     
@@ -332,19 +319,6 @@ char** readPartFromFile(char* fileName, char** part)
     	}
     }
     
-    //DEBUGGING
-    
-    int counter = 0;
-    for(int j = 0; j < 30; j++)
-    {
-        for(int k = 0; k < 30; k++) 
-        {
-            printf("%c", part[j][k]);
-            counter++;
-           if(counter % 31 == 0) printf("\n");
-        }
-    }
-    
     // Closes the file.
 	fclose(file);
 	
@@ -359,12 +333,18 @@ char** mergeParts(char** mergedPicture, char*** parts,
     {
         for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
         {
-            strcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], parts[i][j]);
+            memcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], 
+            				parts[i][j], 
+            				DEFAUL_SIZE_OF_PART * sizeof(char));
             for(int k = 1; k < numberOfColumns; k++)
             {
-                strcat(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], 
-                							parts[i + k * numberOfRows][j]);
+                memcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART] + 
+                							DEFAUL_SIZE_OF_PART * k, 
+                							parts[i + k * numberOfRows][j], 
+                							DEFAUL_SIZE_OF_PART * sizeof(char));
             }
+            mergedPicture[j + i * DEFAUL_SIZE_OF_PART]
+            					[numberOfColumns * DEFAUL_SIZE_OF_PART] = '\0';
         }
     }
     return mergedPicture;
