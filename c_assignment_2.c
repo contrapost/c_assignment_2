@@ -4,16 +4,10 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <ctype.h>
+#include "merge-util.h"
 
 #define LENGTH_OF_FILENAME 256
 #define DEFAUL_SIZE_OF_PART 30
-
-char** readPartFromFile(char* fileName, char** part);
-
-char** sort(char **array, int counter);
-
-char** mergeParts(char** mergedPicture, char*** parts,
-										int numberOfRows, int numberOfColumns);
 
 int main(int argc, char* argv[]) 
 {
@@ -139,7 +133,7 @@ int main(int argc, char* argv[])
     
     // ============ Get number of columns and rows =====================
     
-    fileNames = sort(fileNames, numberOfFileNames);
+    fileNames = sort(fileNames, numberOfFileNames, LENGTH_OF_FILENAME);
     
     int numberOfRows, numberOfColumns;
     char* p = fileNames[numberOfFileNames - 1];
@@ -197,7 +191,7 @@ int main(int argc, char* argv[])
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
-        parts[i] = readPartFromFile(fileNames[i], parts[i]);
+        parts[i] = readPartFromFile(fileNames[i], parts[i], DEFAUL_SIZE_OF_PART);
         
         if (parts[i] == NULL)
         {
@@ -240,21 +234,9 @@ int main(int argc, char* argv[])
     }
     
     mergedPicture = mergeParts(mergedPicture, 
-    									parts, numberOfRows, numberOfColumns);
+    									parts, numberOfRows, numberOfColumns,
+    									DEFAUL_SIZE_OF_PART);
     
-    // =========================== Debugging =================================
-        
-    /*printf("Number of col: %d, number of rows: %d\n", 
-    					numberOfColumns, numberOfRows);
-    
-    for(int i = 0; i < numberOfFileNames; i++) {
-        printf("%d. %s\n", i + 1, fileNames[i]);
-    }
-    
-    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
-    {
-        printf("%s", mergedPicture[i]);
-    } */
     
     // ==================== Write result to the file ==========================
     
@@ -336,97 +318,4 @@ int main(int argc, char* argv[])
     free(fileNames);
     
     return 0;
-}
-
-char** readPartFromFile(char* fileName, char** part) 
-{
-	FILE *file = fopen(fileName, "r");
-	
-	if (file == NULL)
-	{
-		return NULL;
-	}
-    
-    for(int i = 0; i < DEFAUL_SIZE_OF_PART; i++)
-    {
-    	for(int j  = 0; j < DEFAUL_SIZE_OF_PART; j++)
-    	{
-    		int c;
-    		if ((c = fgetc(file)) != EOF)
-    		{
-    			part[i][j] = (char) c;
-    		} 
-    		else 
-    		{
-    			printf("The fragment doesn't contain enough characters");
-    			return NULL;
-    		}
-    	}
-    }
-    
-	fclose(file);
-	
-    return part;
-}
-
-char** mergeParts(char** mergedPicture, char*** parts, 
-										int numberOfRows, int numberOfColumns) 
-{
-    
-    for(int i = 0; i < numberOfRows; i++)
-    {
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
-        {
-            memcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART], 
-            				parts[i][j], 
-            				DEFAUL_SIZE_OF_PART * sizeof(char));
-            for(int k = 1; k < numberOfColumns; k++)
-            {
-                memcpy(mergedPicture[j + i * DEFAUL_SIZE_OF_PART] + 
-                							DEFAUL_SIZE_OF_PART * k, 
-                							parts[i + k * numberOfRows][j], 
-                							DEFAUL_SIZE_OF_PART * sizeof(char));
-            }
-            mergedPicture[j + i * DEFAUL_SIZE_OF_PART]
-            					[numberOfColumns * DEFAUL_SIZE_OF_PART] = '\0';
-        }
-    }
-    return mergedPicture;
-}
-
-// Use sort algorithm from assignment 1
-char** sort(char **array, int length)
-{
-	int comparisionResult;
-    char tmpLine[LENGTH_OF_FILENAME];
-
-    if (length <= 1)
-    {
-        return array;
-	}
-	
-    for (int i = 0; i < length - 1; i++)
-    {
-    	int swapped = 0;
-    	
-        for (int j = 0; j < length - i - 1; j++)
-        {
-            comparisionResult = strcmp(array[j], array[j+1]);
-			
-            if (comparisionResult > 0)
-            {
-                strcpy(tmpLine, array[j+1]);
-                strcpy(array[j+1], array[j]);
-                strcpy(array[j], tmpLine);
-                swapped = 1;
-            }
-        }
-        
-        if(swapped == 0)
-        {
-        	break;
-        }
-    }
-
-	return array;
 }
