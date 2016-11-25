@@ -177,7 +177,9 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    // Allocate memory for 3D array to store contain of the files.
+    // =================== Reading files from the array =======================
+    
+    // Allocate memory for 3D array to store content of the files.
     char*** parts;
     parts = malloc(numberOfFileNames * sizeof(char**));
     for(int i = 0; i < numberOfFileNames; i++) {
@@ -186,8 +188,6 @@ int main(int argc, char* argv[])
             parts[i][j] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char));
         }
     }
-    
-    // ================= Reading files from the array =======================
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
@@ -221,6 +221,13 @@ int main(int argc, char* argv[])
         }
     }
     
+    for(int i = 0; i < numberOfFileNames; i++)
+    {
+        free(fileNames[i]);
+    }
+    
+    free(fileNames);
+    
     // ======================= Merging fragments =============================
     
     // Allocating memory for array of strings containing the resault of merging
@@ -237,51 +244,27 @@ int main(int argc, char* argv[])
     									parts, numberOfRows, numberOfColumns,
     									DEFAUL_SIZE_OF_PART);
     
+    for(int i = 0; i < numberOfFileNames; i++)
+    {
+        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
+        {
+            free(parts[i][j]);
+        }
+    }
+    
+    for(int i = 0; i < numberOfFileNames; i++)
+    {
+        free(parts[i]);
+    }
+    
+    free(parts);
     
     // ==================== Write result to the file ==========================
     
-    if(writeToFile("result.txt", mergedPicture,
-                                    DEFAUL_SIZE_OF_PART * numberOfRows) == -1)
-	{
-		perror ("Error opening file");
-		
-		for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
-		{
-		    free(mergedPicture[i]);
-		}
-		
-		free(mergedPicture);
-		
-		for(int i = 0; i < numberOfFileNames; i++) 
-        {
-            for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) 
-            {
-                free(parts[i][j]);
-            }
-        }
-        
-        for(int i = 0; i < numberOfFileNames; i++) 
-        {
-            free(parts[i]);
-        }
-        
-        free(parts);
-        
-    	for(int i = 0; i < numberOfFileNames; i++) 
-    	{
-    		free(fileNames[i]);
-		}
-
-		free(fileNames);
-		
-		return EXIT_FAILURE;
-	}
+    char resultFileName[] = "result.txt";
     
-    printf("%s %s\n%s\n", "Result of merging files is saved in", "result.txt",
-    				   "You can ispect it by calling cat result.txt");
-    
-    // ====================== Freeing the memory =============================
-    
+    int result = writeToFile(resultFileName, mergedPicture,
+                             DEFAUL_SIZE_OF_PART * numberOfRows);
     
     for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
     {
@@ -290,23 +273,17 @@ int main(int argc, char* argv[])
     
     free(mergedPicture);
     
-    for(int i = 0; i < numberOfFileNames; i++) {
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
-            free(parts[i][j]);
-        }
+    if(result == -1)
+	{
+		perror ("Error opening file");
+		
+		return EXIT_FAILURE;
+	}
+    else
+    {
+        printf("%s \"%s\".\n%s %s\".\n", "Result of merging is saved in", resultFileName,
+               "You can ispect it by calling \"cat", resultFileName);
+        
+        return 0;
     }
-    
-    for(int i = 0; i < numberOfFileNames; i++) {
-    	free(parts[i]);
-    }
-    
-    free(parts);
-    
-    for(int i = 0; i < sizeOfListWithFileNames; i++) {
-        free(fileNames[i]);
-    }
-    
-    free(fileNames);
-    
-    return 0;
 }
