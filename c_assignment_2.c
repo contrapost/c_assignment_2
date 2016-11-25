@@ -4,7 +4,7 @@
 #include <sys/types.h>
 #include <dirent.h>
 #include <ctype.h>
-#include "merge-util.h"
+#include "util.h"
 
 #define LENGTH_OF_FILENAME 256
 #define DEFAUL_SIZE_OF_PART 30
@@ -240,9 +240,8 @@ int main(int argc, char* argv[])
     
     // ==================== Write result to the file ==========================
     
-    FILE *resultFiel = fopen("result.txt", "w");
-    
-	if (resultFiel == NULL)
+    if(writeToFile("result.txt", mergedPicture,
+                                    DEFAUL_SIZE_OF_PART * numberOfRows) == -1)
 	{
 		perror ("Error opening file");
 		
@@ -277,16 +276,8 @@ int main(int argc, char* argv[])
 		
 		return EXIT_FAILURE;
 	}
-	
-	for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
-    {
-        fprintf(resultFiel, "%s", mergedPicture[i]);
-    } 
-    fprintf(resultFiel, "%s", "\n");
     
-    fclose(resultFiel);
-    
-    printf("%s\n%s\n", "Result of merging files is saved in result.txt", 
+    printf("%s %s\n%s\n", "Result of merging files is saved in", "result.txt",
     				   "You can ispect it by calling cat result.txt");
     
     // ====================== Freeing the memory =============================

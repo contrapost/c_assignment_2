@@ -1,4 +1,4 @@
-#include <stdio.h>
+ #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -57,6 +57,26 @@ char** mergeParts(char** mergedPicture, char*** parts,
         }
     }
     return mergedPicture;
+}
+
+int writeToFile(char* name, char** mergedPicture, int numberOfLines)
+{
+    FILE *resultFiel = fopen(name, "w");
+    
+    if (resultFiel == NULL)
+    {
+        return -1;
+    }
+    
+    for(int i = 0; i < numberOfLines; i++)
+    {
+        fprintf(resultFiel, "%s", mergedPicture[i]);
+    } 
+    fprintf(resultFiel, "%s", "\n");
+    
+    fclose(resultFiel);
+    
+    return 0;
 }
 
 // Use sort algorithm from assignment 1
