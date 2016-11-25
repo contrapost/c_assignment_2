@@ -22,8 +22,8 @@ The program was tested with Valgrind. You can run:
 2. The program reads each file from the list and puts the content of the file into a 2D array of characters (size of array is set as constant and is equal 30). 
 3. The program places content of each file (i.e. 2D array of chars) into a 3D array. When the program has read all the files, the 3D array contains all the data from the files.
 4. Then the program merges fragments from respective indices of the 3D array into strings and put them into a new 2D array that will contain the result of merging. On this stage the program converts sequences of characters into strings by adding '\0' at the end.
-5. When all data from the 3D array are merged and places into 2D array, the program writes the 2D array into file. 
+5. When all data from the 3D array are merged and placed into 2D array, the program writes the 2D array into file. 
 
 ### Alternative solutions
 The program uses 3D array as buffer that stores all the data from the files and places the merged data into a 2D array before writing it into a file. Another approach is to read original files part by part, merge respective parts and put them into the result file. In this case the program won't use external memory resources for temporal saving of the data, but it should deal simultaneously with n+1 files, where n is the number of the files with fragments of the picture plus one file with the result of the merging. 
-The merging can also be done with just one 2D array of characters for buffering the data. In this case each index of that array will represent a column of files and the content of each index will be a sequence of characters from all the files from that column. In this case merging algorithm will be very simple because the program will read the parts with exactly the same start and end indices. 
+The merging can also be done with just one 2D array of characters for buffering the data. In this case each index of that array will represent a column of files and the content of each index will be a sequence of characters from all the files from that column. 
