@@ -210,7 +210,7 @@ int main(int argc, char* argv[])
             
             free(parts);
             
-        	for(int i = 0; i < numberOfFileNames; i++) 
+        	for(int i = 0; i < sizeOfListWithFileNames; i++) 
         	{
         		free(fileNames[i]);
     		}
@@ -221,7 +221,7 @@ int main(int argc, char* argv[])
         }
     }
     
-    for(int i = 0; i < numberOfFileNames; i++)
+    for(int i = 0; i < sizeOfListWithFileNames; i++)
     {
         free(fileNames[i]);
     }
