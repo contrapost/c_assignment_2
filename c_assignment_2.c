@@ -7,7 +7,7 @@
 #include "util.h"
 
 #define LENGTH_OF_FILENAME 256
-#define DEFAUL_SIZE_OF_PART 30
+#define DEFAULT_SIZE_OF_PART 30
 
 int main(int argc, char* argv[]) 
 {
@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    // Check if user didn't forget "/" at the end of the path to the direrctory
+    // Check if user didn't forget "/" at the end of the path to the directory
     // and append it if it's necessary
     if(dirname && *dirname && dirname[strlen(dirname) - 1] != '/') 
     {
@@ -183,21 +183,22 @@ int main(int argc, char* argv[])
     char*** parts;
     parts = malloc(numberOfFileNames * sizeof(char**));
     for(int i = 0; i < numberOfFileNames; i++) {
-        parts[i] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char*));
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) {
-            parts[i][j] = malloc(DEFAUL_SIZE_OF_PART * sizeof(char));
+        parts[i] = malloc(DEFAULT_SIZE_OF_PART * sizeof(char*));
+        for(int j = 0; j < DEFAULT_SIZE_OF_PART; j++) {
+            parts[i][j] = malloc(DEFAULT_SIZE_OF_PART * sizeof(char));
         }
     }
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
-        parts[i] = readPartFromFile(fileNames[i], parts[i], DEFAUL_SIZE_OF_PART);
+        parts[i] = readPartFromFile(fileNames[i], parts[i], 
+        											DEFAULT_SIZE_OF_PART);
         
         if (parts[i] == NULL)
         {
             for(int i = 0; i < numberOfFileNames; i++) 
             {
-                for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++) 
+                for(int j = 0; j < DEFAULT_SIZE_OF_PART; j++) 
                 {
                     free(parts[i][j]);
                 }
@@ -230,23 +231,23 @@ int main(int argc, char* argv[])
     
     // ======================= Merging fragments =============================
     
-    // Allocating memory for array of strings containing the resault of merging
+    // Allocating memory for array of strings containing the result of merging
     char** mergedPicture;
-    mergedPicture = malloc(numberOfRows * DEFAUL_SIZE_OF_PART * sizeof(char*));
-    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    mergedPicture = malloc(numberOfRows * DEFAULT_SIZE_OF_PART * sizeof(char*));
+    for(int i = 0; i < DEFAULT_SIZE_OF_PART * numberOfRows; i++)
     {
         mergedPicture[i] = 
-        	malloc((DEFAUL_SIZE_OF_PART * numberOfColumns + 1) * sizeof(char));
+        	malloc((DEFAULT_SIZE_OF_PART * numberOfColumns + 1) * sizeof(char));
         		
     }
     
     mergedPicture = mergeParts(mergedPicture, 
     									parts, numberOfRows, numberOfColumns,
-    									DEFAUL_SIZE_OF_PART);
+    									DEFAULT_SIZE_OF_PART);
     
     for(int i = 0; i < numberOfFileNames; i++)
     {
-        for(int j = 0; j < DEFAUL_SIZE_OF_PART; j++)
+        for(int j = 0; j < DEFAULT_SIZE_OF_PART; j++)
         {
             free(parts[i][j]);
         }
@@ -264,9 +265,9 @@ int main(int argc, char* argv[])
     char resultFileName[] = "result.txt";
     
     int result = writeToFile(resultFileName, mergedPicture,
-                             DEFAUL_SIZE_OF_PART * numberOfRows);
+                             DEFAULT_SIZE_OF_PART * numberOfRows);
     
-    for(int i = 0; i < DEFAUL_SIZE_OF_PART * numberOfRows; i++)
+    for(int i = 0; i < DEFAULT_SIZE_OF_PART * numberOfRows; i++)
     {
         free(mergedPicture[i]);
     }
@@ -281,8 +282,9 @@ int main(int argc, char* argv[])
 	}
     else
     {
-        printf("%s \"%s\".\n%s %s\".\n", "Result of merging is saved in", resultFileName,
-               "You can ispect it by calling \"cat", resultFileName);
+        printf("%s \"%s\".\n%s %s\".\n", "Result of merging is saved in", 
+        		resultFileName,"You can inspect it by calling \"cat", 
+        		resultFileName);
         
         return 0;
     }
